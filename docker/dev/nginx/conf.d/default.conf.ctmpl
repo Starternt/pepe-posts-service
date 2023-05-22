@@ -1,7 +1,7 @@
 upstream backend {
-  server 172.16.112.11:9000;
-  server 172.16.112.9:9000;
-  server 172.16.112.10:9000;
+{{- range service "pepe-posts_php-fpm" }}
+  server {{ .Address }}:{{ .Port }};
+{{- end }}
 }
 
 server {

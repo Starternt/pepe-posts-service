@@ -9,14 +9,15 @@ services:
       dockerfile: nginx.docker
     volumes:
       - ./app:/app
+      - "./docker/dev/nginx/conf.d:/etc/nginx/conf.d"
     depends_on:
       - php-fpm
+      - consul-template
     ports:
       - "${DOCKER_NGINX_PORT}:80"
     networks:
       - internal
   php-fpm:
-    container_name: ${DOCKER_PROJECT_TITLE}-php-fpm
     restart: always
     build:
       context: ./docker/dev
@@ -64,6 +65,17 @@ services:
     networks:
       - internal
 
+  consul-template:
+    image: hashicorp/consul-template:alpine
+    container_name: "consul-template"
+    hostname: consul-template
+    networks:
+      - internal
+    volumes:
+      - "./docker/consul-template/consul-template.hcl:/data/consul-template.hcl:ro"
+      - "./docker/dev/nginx/conf.d:/config"
+    command: consul-template -config /data/consul-template.hcl
+
 volumes:
   composer:
   postgres:
@@ -73,6 +85,7 @@ networks:
   # Xdebug config
   internal:
     driver: bridge
+    name: pepe-network-test
     ipam:
       driver: default
       config:

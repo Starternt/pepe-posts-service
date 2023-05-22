@@ -9,15 +9,15 @@ init: composer-install db-create db-migrations permissions-fix
 up: docker-up
 down: docker-down
 restart: down up
-rebuild: down docker-build
+rebuild: docker-build
 reset: rebuild up
 
 docker-up:
-	docker-compose -p $(DOCKER_PROJECT_TITLE) up -d
+	docker-compose -p $(DOCKER_PROJECT_TITLE) up --scale php-fpm=3 -d
 	@echo ***Success! Your app is ready and available at http://localhost:$(DOCKER_NGINX_PORT) and you can connect PostgreSQL from your host machine on port $(DOCKER_POSTGRESQL_PORT).***
 
 docker-down:
-	docker-compose -p $(DOCKER_PROJECT_TITLE) down --remove-orphans
+	docker-compose -p $(DOCKER_PROJECT_TITLE) down
 
 docker-down-clear:
 	docker-compose -p $(DOCKER_PROJECT_TITLE) down -v --remove-orphans
